@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.ServiceBus;
@@ -15,21 +16,27 @@ namespace session_queue_message_generator
         static async Task Main(string[] args)
         {
             Console.WriteLine("Creating Service Bus sender....");
+            var taskList = new List<Task>();
             var sender = new MessageSender(connectionString, queueName);
 
             for(int s = 0; s < sessions; s++)
             {
-                var sessionId = Guid.NewGuid().ToString();
-                
+                var sessionId = s.ToString();
+                var messageList = new List<Message>();
                 for(int m = 0; m < messagePerSession; m++)
                 {
                     var message = new Message(Encoding.UTF8.GetBytes($"Message-{m}")) 
                     {
                         SessionId = sessionId
                     };
-                    await sender.SendAsync(message);
+                    messageList.Add(message);
                 }
-            }            
+                taskList.Add(sender.SendAsync(messageList));
+            }
+            
+            Console.WriteLine("Sending all messages...");
+            await Task.WhenAll(taskList);
+            Console.WriteLine("All messages sent.");
         }
     }
 }

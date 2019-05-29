@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 [assembly: FunctionsStartup(typeof(Hollan.Function.Startup))]
@@ -11,11 +13,14 @@ namespace Hollan.Function
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddSingleton<IDatabase>((s) => {
-                ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("RedisDbConnectionString"));
-                return redis.GetDatabase();
+            builder.Services.AddSingleton<ConnectionMultiplexer>((s) => {
+                string configString = Environment.GetEnvironmentVariable("RedisDbConnectionString");
+                var options = ConfigurationOptions.Parse(configString);
+                options.ConnectTimeout = 40000;
+                var cm = ConnectionMultiplexer.Connect(options);
+                return cm;
             });
-            builder.Services.AddSingleton<IOrderedListClient, RedisOrderedListClient>();
+            builder.Services.AddScoped<IOrderedListClient, RedisOrderedListClient>();
         }
     }
 }
