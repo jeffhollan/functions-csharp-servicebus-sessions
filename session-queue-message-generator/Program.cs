@@ -11,8 +11,8 @@ namespace session_queue_message_generator
     {
         private static string connectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
         private static string queueName = Environment.GetEnvironmentVariable("QueueName");
-        private static int sessions = 50;
-        private static int messagePerSession = 10;
+        private static int sessions = 1000;
+        private static int messagePerSession = 4;
         static async Task Main(string[] args)
         {
             Console.WriteLine("Creating Service Bus sender....");
@@ -21,7 +21,7 @@ namespace session_queue_message_generator
 
             for(int s = 0; s < sessions; s++)
             {
-                var sessionId = s.ToString();
+                var sessionId = $"Patient-{s.ToString()};
                 var messageList = new List<Message>();
                 for(int m = 0; m < messagePerSession; m++)
                 {
