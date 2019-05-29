@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "functions-csharp-servicebus-sessions"
+		},
+		{
+			"path": "session-queue-message-generator"
+		}
+	],
+	"settings": {
+		"debug.internalConsoleOptions": "neverOpen"
+	}
+}
