@@ -16,11 +16,11 @@ namespace Hollan.Function
         }
         [FunctionName("SessionTrigger")]
         public async Task Run(
-            [ServiceBusTrigger("queue", Connection = "ServiceBusConnectionString", IsSessionsEnabled = true)]Message message, 
+            [ServiceBusTrigger("vanilla", Connection = "ServiceBusConnectionString")]Message message, 
             ILogger log)
         {
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {Encoding.UTF8.GetString(message.Body)}");
-            await _client.PushData(message.SessionId, Encoding.UTF8.GetString(message.Body));
+            await _client.PushData((string)message.UserProperties["patientId"], Encoding.UTF8.GetString(message.Body));
         }
     }
 }
